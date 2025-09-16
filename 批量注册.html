@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批量用户注册工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 95vh;
+        }
+        
+        header {
+            background: #4a6bdf;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .description {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        
+        .left-panel {
+            width: 35%;
+            padding: 20px;
+            background: #f8f9fa;
+            border-right: 1px solid #eaeaea;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .right-panel {
+            width: 65%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .api-config {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .generation-rules {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .single-user {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input[type="text"], input[type="password"], input[type="number"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #4a6bdf;
+            outline: none;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .users-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .users-table th, .users-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .users-table thead {
+            background-color: #f8f9fa;
+        }
+        
+        .users-table th {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #4a6bdf;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #3a5bc9;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .response-container {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .response-title {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .response-content {
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            flex-grow: 1;
+            background: #1a2530;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-success {
+            background: #28a745;
+        }
+        
+        .status-error {
+            background: #dc3545;
+        }
+        
+        .status-waiting {
+            background: #6c757d;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: #6c757d;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        
+        .rules-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .rules-row .input-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .random-length {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .random-length input {
+            width: 80px;
+        }
+        
+        .fixed-role {
+            background-color: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            color: #495057;
+        }
+        
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .left-panel, .right-panel {
+                width: 100%;
+            }
+            
+            .left-panel {
+                border-right: none;
+                border-bottom: 1px solid #eaeaea;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .rules-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>批量用户注册工具</h1>
+            <p class="description">支持批量生成用户账号，自定义生成规则</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="api-config">
+                    <h2>接口配置</h2>
+                    <div class="input-group">
+                        <label for="api-url">接口地址</label>
+                        <input type="text" id="api-url" placeholder="请输入完整的API接口地址" value="https://example.com/api/public/addUser">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="auth-token">Authorization 令牌</label>
+                        <input type="text" id="auth-token" placeholder="请输入身份令牌">
+                    </div>
+                </div>
+                
+                <div class="generation-rules">
+                    <h2>批量生成规则</h2>
+                    
+                    <div class="input-group">
+                        <label for="user-count">生成数量</label>
+                        <input type="number" id="user-count" min="1" max="1000" value="5">
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="use-custom-prefix">
+                        <label for="use-custom-prefix">使用自定义前缀</label>
+                    </div>
+                    
+                    <div id="custom-prefix-container" style="display: none;">
+                        <div class="rules-row">
+                            <div class="input-group">
+                                <label for="email-prefix">邮箱前缀</label>
+                                <input type="text" id="email-prefix" placeholder="例如: user">
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="random-length">随机部分长度 (1-8)</label>
+                                <input type="number" id="random-length" min="1" max="8" value="4">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="email-domain">邮箱域名</label>
+                        <input type="text" id="email-domain" placeholder="例如: @example.com" value="@example.com">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="password-type">密码生成方式</label>
+                        <select id="password-type">
+                            <option value="auto">自动生成随机密码</option>
+                            <option value="fixed">使用固定密码</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group" id="fixed-password-container" style="display: none;">
+                        <label for="fixed-password">固定密码</label>
+                        <input type="password" id="fixed-password" placeholder="请输入固定密码">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>权限身份</label>
+                        <div class="fixed-role">默认权限 (不可更改)</div>
+                    </div>
+                    
+                    <button class="btn-warning" id="generate-users">
+                        <i class="fas fa-cogs"></i> 批量生成用户
+                    </button>
+                </div>
+                
+                <div class="single-user">
+                    <h2>添加单个用户</h2>
+                    
+                    <div class="input-group">
+                        <label for="single-email">邮箱地址</label>
+                        <input type="text" id="single-email" placeholder="例如: user@example.com">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="single-password">密码</label>
+                        <input type="password" id="single-password" placeholder="留空则自动生成">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>权限身份</label>
+                        <div class="fixed-role">默认权限 (不可更改)</div>
+                    </div>
+                    
+                    <button class="btn-success" id="add-single-user">
+                        <i class="fas fa-user-plus"></i> 添加单个用户
+                    </button>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <h2>生成用户列表 <span id="users-count">(0 个用户)</span></h2>
+                <div class="users-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>邮箱地址</th>
+                                <th>密码</th>
+                                <th>权限身份</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-list">
+                            <!-- 用户列表将动态生成 -->
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 20px; color: #6c757d;">
+                                    尚未生成用户，请添加用户
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn-primary" id="send-request">
+                        <i class="fas fa-paper-plane"></i> 发送请求
+                    </button>
+                    <button class="btn-secondary" id="export-users">
+                        <i class="fas fa-download"></i> 导出用户
+                    </button>
+                    <button class="btn-danger" id="clear-all">
+                        <i class="fas fa-trash"></i> 清空用户
+                    </button>
+                </div>
+                
+                <div class="response-container">
+                    <div class="response-title">
+                        <h3>响应结果</h3>
+                        <span class="status-indicator status-waiting" id="status-indicator">等待请求</span>
+                    </div>
+                    <div class="response-content" id="response-content">
+// 响应将显示在这里
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 批量用户注册工具 | 接口路径: POST /api/public/addUser</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const usersList = document.getElementById('users-list');
+            const generateUsersBtn = document.getElementById('generate-users');
+            const addSingleUserBtn = document.getElementById('add-single-user');
+            const sendRequestBtn = document.getElementById('send-request');
+            const clearAllBtn = document.getElementById('clear-all');
+            const exportUsersBtn = document.getElementById('export-users');
+            const responseContent = document.getElementById('response-content');
+            const statusIndicator = document.getElementById('status-indicator');
+            const usersCount = document.getElementById('users-count');
+            const passwordType = document.getElementById('password-type');
+            const useCustomPrefix = document.getElementById('use-custom-prefix');
+            const customPrefixContainer = document.getElementById('custom-prefix-container');
+            
+            let generatedUsers = [];
+            
+            // 显示/隐藏固定密码输入框
+            passwordType.addEventListener('change', function() {
+                const fixedPasswordContainer = document.getElementById('fixed-password-container');
+                fixedPasswordContainer.style.display = this.value === 'fixed' ? 'block' : 'none';
+            });
+            
+            // 显示/隐藏自定义前缀输入框
+            useCustomPrefix.addEventListener('change', function() {
+                customPrefixContainer.style.display = this.checked ? 'block' : 'none';
+            });
+            
+            // 生成随机字符串（字母和数字）
+            function generateRandomString(length = 8, numbersOnly = false) {
+                const letters = 'abcdefghijklmnopqrstuvwxyz';
+                const numbers = '0123456789';
+                const chars = numbersOnly ? numbers : letters + numbers;
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+            
+            // 生成随机密码
+            function generateRandomPassword() {
+                return generateRandomString(12);
+            }
+            
+            // 生成用户
+            generateUsersBtn.addEventListener('click', function() {
+                const count = parseInt(document.getElementById('user-count').value) || 5;
+                const usePrefix = document.getElementById('use-custom-prefix').checked;
+                const emailPrefix = document.getElementById('email-prefix').value;
+                const randomLength = parseInt(document.getElementById('random-length').value) || 4;
+                const domain = document.getElementById('email-domain').value;
+                const passwordTypeValue = document.getElementById('password-type').value;
+                const fixedPassword = document.getElementById('fixed-password').value;
+                
+                // 确定域名
+                let emailDomain = domain;
+                if (!emailDomain.startsWith('@')) {
+                    emailDomain = '@' + emailDomain;
+                }
+                
+                // 清空之前的用户
+                generatedUsers = [];
+                
+                // 生成用户列表
+                for (let i = 1; i <= count; i++) {
+                    // 生成邮箱
+                    let email;
+                    if (usePrefix && emailPrefix) {
+                        // 使用自定义前缀 + 随机部分
+                        const randomPart = generateRandomString(randomLength);
+                        email = `${emailPrefix}${randomPart}${emailDomain}`;
+                    } else {
+                        // 完全随机生成账号（字母+数字，最大8位）
+                        const randomLength = Math.floor(Math.random() * 8) + 1; // 1-8位随机长度
+                        email = `${generateRandomString(randomLength)}${emailDomain}`;
+                    }
+                    
+                    // 生成密码
+                    let password;
+                    if (passwordTypeValue === 'fixed' && fixedPassword) {
+                        password = fixedPassword;
+                    } else {
+                        password = generateRandomPassword();
+                    }
+                    
+                    generatedUsers.push({
+                        email: email,
+                        password: password,
+                        // 不发送roleName字段，使用默认权限
+                    });
+                }
+                
+                // 更新用户列表显示
+                updateUsersList();
+            });
+            
+            // 添加单个用户
+            addSingleUserBtn.addEventListener('click', function() {
+                const email = document.getElementById('single-email').value;
+                let password = document.getElementById('single-password').value;
+                
+                if (!email) {
+                    alert('请输入邮箱地址！');
+                    return;
+                }
+                
+                // 如果密码为空，则自动生成
+                if (!password) {
+                    password = generateRandomPassword();
+                }
+                
+                generatedUsers.push({
+                    email: email,
+                    password: password,
+                    // 不发送roleName字段，使用默认权限
+                });
+                
+                // 清空单个用户表单
+                document.getElementById('single-email').value = '';
+                document.getElementById('single-password').value = '';
+                
+                // 更新用户列表显示
+                updateUsersList();
+            });
+            
+            // 更新用户列表显示
+            function updateUsersList() {
+                usersList.innerHTML = '';
+                
+                if (generatedUsers.length === 0) {
+                    usersList.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #6c757d;">
+                                尚未生成用户，请添加用户
+                            </td>
+                        </tr>
+                    `;
+                    usersCount.textContent = '(0 个用户)';
+                    return;
+                }
+                
+                generatedUsers.forEach((user, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${user.email}</td>
+                        <td>${user.password}</td>
+                        <td>默认</td>
+                        <td>
+                            <button class="btn-danger delete-user" data-index="${index}" style="padding: 5px 10px; font-size: 12px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    usersList.appendChild(row);
+                });
+                
+                // 添加删除单个用户的功能
+                document.querySelectorAll('.delete-user').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        generatedUsers.splice(index, 1);
+                        updateUsersList();
+                    });
+                });
+                
+                usersCount.textContent = `(${generatedUsers.length} 个用户)`;
+            }
+            
+            // 清空用户
+            clearAllBtn.addEventListener('click', function() {
+                if (confirm('确定要清空所有用户数据吗？')) {
+                    generatedUsers = [];
+                    updateUsersList();
+                }
+            });
+            
+            // 发送请求
+            sendRequestBtn.addEventListener('click', function() {
+                const apiUrl = document.getElementById('api-url').value;
+                const authToken = document.getElementById('auth-token').value;
+                
+                // 验证必填字段
+                if (!apiUrl) {
+                    alert('请输入接口地址！');
+                    return;
+                }
+                
+                if (!authToken) {
+                    alert('请输入Authorization令牌！');
+                    return;
+                }
+                
+                if (generatedUsers.length === 0) {
+                    alert('请先生成用户！');
+                    return;
+                }
+                
+                // 构建请求数据
+                const requestData = {
+                    list: generatedUsers
+                };
+                
+                // 更新UI为正在加载状态
+                sendRequestBtn.disabled = true;
+                sendRequestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 发送中...';
+                statusIndicator.textContent = '请求中';
+                statusIndicator.className = 'status-indicator status-waiting';
+                responseContent.textContent = '正在发送请求...';
+                
+                // 使用fetch发送真实请求
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authToken
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('网络响应不正常');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    statusIndicator.textContent = '成功';
+                    statusIndicator.className = 'status-indicator status-success';
+                    responseContent.textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    statusIndicator.textContent = '错误';
+                    statusIndicator.className = 'status-indicator status-error';
+                    responseContent.textContent = JSON.stringify({
+                        status: 'error',
+                        message: '请求失败: ' + error.message,
+                        errorCode: 'REQUEST_FAILED'
+                    }, null, 2);
+                })
+                .finally(() => {
+                    // 恢复按钮状态
+                    sendRequestBtn.disabled = false;
+                    sendRequestBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 发送请求';
+                });
+            });
+            
+            // 导出用户为TXT格式
+            exportUsersBtn.addEventListener('click', function() {
+                if (generatedUsers.length === 0) {
+                    alert('没有用户数据可导出！');
+                    return;
+                }
+                
+                // 生成TXT内容，格式为：邮箱----密码
+                let txtContent = '';
+                generatedUsers.forEach(user => {
+                    txtContent += `${user.email}----${user.password}\n`;
+                });
+                
+                const blob = new Blob([txtContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'users.txt';
+                a.click();
+                
+                URL.revokeObjectURL(url);
+            });
+        });
+    </script>
+</body>
+</html>

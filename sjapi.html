@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+
+        <div class="form-group">
+            <label for="authorization"></label>
+           <input type="text" id="authorization" style="display: none;">
+        </div>
+        
+        <button id="submit-btn"></button>
+        <script>
+             document.getElementById("submit-btn").style.display = "none";
+        </script>
+        
+        <div class="loader" id="loader">
+            <div class="loader-spinner"></div>
+            <p style="margin-top: 10px;">正在获取，请稍候...</p>
+        </div>
+        
+        <div class="result" id="result">
+            <div class="result-title"></div>
+            <div id="latest-indicator" class="latest-indicator">这是最新的一条结果</div>
+            <pre id="result-content"></pre>
+        </div>
+        
+        <div class="url-example">
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const submitBtn = document.getElementById('submit-btn');
+            const authorizationInput = document.getElementById('authorization');
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('result-content');
+            const loader = document.getElementById('loader');
+            const latestIndicator = document.getElementById('latest-indicator');
+            
+            // 从URL参数获取token
+            const urlParams = new URLSearchParams(window.location.search);
+            const tokenFromUrl = urlParams.get('token');
+            
+            // 如果URL中有token，则填充到输入框并自动查询
+            if (tokenFromUrl) {
+                authorizationInput.value = tokenFromUrl;
+                fetchEmailList(tokenFromUrl);
+            }
+            
+            submitBtn.addEventListener('click', function() {
+                const authToken = authorizationInput.value.trim();
+                
+                if (!authToken) {
+                    alert('请输入身份令牌');
+                    return;
+                }
+                
+                // 更新URL，添加token参数
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.set('token', authToken);
+                window.history.replaceState({}, '', newUrl);
+                
+                fetchEmailList(authToken);
+            });
+            
+            function fetchEmailList(authToken) {
+                // 显示加载中，隐藏结果
+                loader.style.display = 'block';
+                resultDiv.style.display = 'none';
+                submitBtn.disabled = true;
+                
+                // 准备请求数据
+                const requestData = {
+                    page: 1,
+                    limit: 20
+                };
+                
+                // 发送POST请求
+                fetch('/api/public/emailList', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': authToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP错误! 状态: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 显示成功结果
+                    if (data.data && data.data.length > 0) {
+                        // 获取最新的一条数据
+                        const latestEmail = data.data[0];
+                        resultContent.textContent = JSON.stringify(latestEmail, null, 2);
+                        latestIndicator.style.display = 'block';
+                    } else {
+                        resultContent.textContent = JSON.stringify(data, null, 2);
+                        latestIndicator.style.display = 'none';
+                    }
+                    
+                    resultDiv.className = 'result success';
+                    resultDiv.style.display = 'block';
+                })
+                .catch(error => {
+                    // 显示错误信息
+                    resultContent.textContent = `错误: ${error.message}`;
+                    resultDiv.className = 'result error';
+                    resultDiv.style.display = 'block';
+                    latestIndicator.style.display = 'none';
+                })
+                .finally(() => {
+                    // 隐藏加载指示器
+                    loader.style.display = 'none';
+                    submitBtn.disabled = false;
+                });
+            }
+        });
+    </script>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="refresh" content="20" >
+	</head>
+	<body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成Token</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input[type="email"],
+        input[type="password"],
+        input[type="url"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="url"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        
+        .success {
+            display: block;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .error {
+            display: block;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        pre {
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 14px;
+        }
+        
+        .code {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        
+        .code h3 {
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loader div {
+            width: 12px;
+            height: 12px;
+            background-color: #3498db;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 3px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        
+        .loader div:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .loader div:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+        
+        .url-note {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>生成Token接口请求</h1>
+        
+        <form id="tokenForm">
+            <div class="form-group">
+                <label for="apiEndpoint">API接口地址</label>
+                <input type="url" id="apiEndpoint" placeholder="请输入完整的API接口地址，例如：https://api.example.com/api/public/genToken" required>
+                <p class="url-note">如果不确定，请保持默认或咨询API提供方</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">管理员邮箱</label>
+                <input type="email" id="email" placeholder="请输入管理员邮箱" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">邮箱密码</label>
+                <input type="password" id="password" placeholder="请输入邮箱密码" required>
+            </div>
+            
+            <button type="submit">生成Token</button>
+        </form>
+        
+        <div class="loader" id="loader">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        
+        <div class="result" id="result">
+            <h3>请求结果</h3>
+            <pre id="resultContent"></pre>
+        </div>
+        
+        <div class="code">
+            <h3>接口说明</h3>
+            <p>接口方法: POST</p>
+            <p>请求参数:</p>
+            <ul>
+                <li>email: string (必填) - 管理员邮箱</li>
+                <li>password: string (必填) - 邮箱密码</li>
+            </ul>
+            <p>成功响应将返回包含token的JSON对象</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('tokenForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const apiEndpoint = document.getElementById('apiEndpoint').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            const loader = document.getElementById('loader');
+            
+            // 验证URL格式
+            if (!isValidUrl(apiEndpoint)) {
+                resultDiv.className = 'result error';
+                resultContent.textContent = '错误：请输入有效的API接口地址，例如 https://api.example.com/api/public/genToken';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            // 显示加载动画
+            loader.style.display = 'block';
+            resultDiv.style.display = 'none';
+            
+            try {
+                // 发送POST请求
+                const response = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // 隐藏加载动画
+                loader.style.display = 'none';
+                
+                // 显示结果
+                resultDiv.className = response.ok ? 'result success' : 'result error';
+                resultContent.textContent = JSON.stringify(data, null, 2);
+                resultDiv.style.display = 'block';
+                
+            } catch (error) {
+                // 隐藏加载动画
+                loader.style.display = 'none';
+                
+                // 显示错误
+                resultDiv.className = 'result error';
+                resultContent.textContent = '请求失败: ' + error.message;
+                resultDiv.style.display = 'block';
+            }
+        });
+        
+        // 简单的URL验证函数
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>
