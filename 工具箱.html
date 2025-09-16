@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudmailAPI工具箱</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 全局样式 */
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --info: #7209b7;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --danger: #e63946;
+            --warning: #fca311;
+            --gray: #6c757d;
+            --light-blue: #e7f5ff;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        /* 导航栏样式 */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1.2rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo i {
+            font-size: 1.8rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .logo span {
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        /* 主容器 */
+        .main-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+        
+        .sidebar-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-blue);
+            font-weight: 600;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .nav-item:hover {
+            background: var(--light-blue);
+            color: var(--primary);
+        }
+        
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* 内容区域 */
+        .content {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .page {
+            display: none;
+            padding: 0;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #d4e8ff 100%);
+            padding: 25px 30px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .page-description {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 800px;
+        }
+        
+        .page-content {
+            padding: 30px;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #eaeaea;
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-blue);
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button.secondary {
+            background: var(--gray);
+        }
+        
+        button.success {
+            background: var(--success);
+        }
+        
+        button.warning {
+            background: var(--warning);
+        }
+        
+        button.danger {
+            background: var(--danger);
+        }
+        
+        /* 响应区域 */
+        .response-area {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+        }
+        
+        .response-title {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .response-content {
+            font-family: monospace;
+            white-space: pre-wrap;
+            background: #1a2530;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        /* 用户列表 */
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .users-table th, .users-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .users-table thead {
+            background-color: var(--light-blue);
+        }
+        
+        .users-table th {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            color: var(--gray);
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            background: white;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                position: relative;
+                top: 0;
+            }
+            
+            .nav-items {
+                display: flex;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            
+            .nav-item {
+                white-space: nowrap;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .page-content {
+                padding: 20px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+        
+        /* 工具特定样式 */
+        .url-note {
+            font-size: 14px;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loader div {
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 3px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        
+        .success {
+            display: block;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .error {
+            display: block;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .rules-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .fixed-role {
+            background-color: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            color: #495057;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-cloud"></i>
+            <h1>Cloudmail<span>API</span> 工具箱</h1>
+        </div>
+        <div class="header-info">
+            <p>一站式API工具集合，简化您的开发流程</p>
+        </div>
+    </header>
+    
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <h2 class="sidebar-title">工具导航</h2>
+            <div class="nav-items">
+                <div class="nav-item active" data-page="token-page">
+                    <i class="fas fa-key"></i>
+                    <span>生成Token</span>
+                </div>
+                <div class="nav-item" data-page="batch-page">
+                    <i class="fas fa-users"></i>
+                    <span>批量用户注册</span>
+                </div>
+                <div class="nav-item" data-page="download-page">
+                    <i class="fas fa-download"></i>
+                    <span>收件源码下载</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 内容区域 -->
+        <div class="content">
+            <!-- 生成Token页面 -->
+            <div id="token-page" class="page active">
+                <div class="page-header">
+                    <h2 class="page-title">Token生成工具</h2>
+                    <p class="page-description">通过API接口生成身份验证令牌，用于访问其他API服务</p>
+                </div>
+                
+                <div class="page-content">
+                    <div class="card">
+                        <h3 class="card-title">请求参数</h3>
+                        <form id="tokenForm">
+                            <div class="form-group">
+                                <label for="apiEndpoint">API接口地址</label>
+                                <input type="url" id="apiEndpoint" placeholder="请输入完整的API接口地址，例如：https://api.example.com/api/public/genToken" required>
+                                <p class="url-note">如果不确定，请保持默认或咨询API提供方</p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">管理员邮箱</label>
+                                <input type="email" id="email" placeholder="请输入管理员邮箱" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="password">邮箱密码</label>
+                                <input type="password" id="password" placeholder="请输入邮箱密码" required>
+                            </div>
+                            
+                            <button type="submit">
+                                <i class="fas fa-key"></i> 生成Token
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="loader" id="loader">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    
+                    <div class="result" id="result">
+                        <h3>请求结果</h3>
+                        <pre id="resultContent"></pre>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 class="card-title">接口说明</h3>
+                        <p><strong>接口方法:</strong> POST</p>
+                        <p><strong>请求参数:</strong></p>
+                        <ul>
+                            <li>email: string (必填) - 管理员邮箱</li>
+                            <li>password: string (必填) - 邮箱密码</li>
+                        </ul>
+                        <p>成功响应将返回包含token的JSON对象</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 批量用户注册页面 -->
+            <div id="batch-page" class="page">
+                <div class="page-header">
+                    <h2 class="page-title">批量用户注册工具</h2>
+                    <p class="page-description">支持批量生成用户账号，自定义生成规则，简化用户管理流程</p>
+                </div>
+                
+                <div class="page-content">
+                    <div class="card">
+                        <h3 class="card-title">接口配置</h3>
+                        <div class="form-group">
+                            <label for="api-url">接口地址</label>
+                            <input type="text" id="api-url" placeholder="请输入完整的API接口地址" value="https://example.com/api/public/addUser">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="auth-token">Authorization 令牌</label>
+                            <input type="text" id="auth-token" placeholder="请输入身份令牌">
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 class="card-title">批量生成规则</h3>
+                        <div class="form-group">
+                            <label for="user-count">生成数量</label>
+                            <input type="number" id="user-count" min="1" max="1000" value="5">
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="use-custom-prefix">
+                            <label for="use-custom-prefix">使用自定义前缀</label>
+                        </div>
+                        
+                        <div id="custom-prefix-container" style="display: none;">
+                            <div class="rules-row">
+                                <div class="form-group">
+                                    <label for="email-prefix">邮箱前缀</label>
+                                    <input type="text" id="email-prefix" placeholder="例如: user">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="random-length">随机部分长度 (1-8)</label>
+                                    <input type="number" id="random-length" min="1" max="8" value="4">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email-domain">邮箱域名</label>
+                            <input type="text" id="email-domain" placeholder="例如: @example.com" value="@example.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password-type">密码生成方式</label>
+                            <select id="password-type">
+                                <option value="auto">自动生成随机密码</option>
+                                <option value="fixed">使用固定密码</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" id="fixed-password-container" style="display: none;">
+                            <label for="fixed-password">固定密码</label>
+                            <input type="password" id="fixed-password" placeholder="请输入固定密码">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>权限身份</label>
+                            <div class="fixed-role">默认权限 (不可更改)</div>
+                        </div>
+                        
+                        <button class="warning" id="generate-users">
+                            <i class="fas fa-cogs"></i> 批量生成用户
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 class="card-title">添加单个用户</h3>
+                        <div class="form-group">
+                            <label for="single-email">邮箱地址</label>
+                            <input type="text" id="single-email" placeholder="例如: user@example.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="single-password">密码</label>
+                            <input type="password" id="single-password" placeholder="留空则自动生成">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>权限身份</label>
+                            <div class="fixed-role">默认权限 (不可更改)</div>
+                        </div>
+                        
+                        <button class="success" id="add-single-user">
+                            <i class="fas fa-user-plus"></i> 添加单个用户
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 class="card-title">生成用户列表 <span id="users-count">(0 个用户)</span></h3>
+                        <div class="users-container">
+                            <table class="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>邮箱地址</th>
+                                        <th>密码</th>
+                                        <th>权限身份</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-list">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 20px; color: #6c757d;">
+                                            尚未生成用户，请添加用户
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="primary" id="send-request">
+                                <i class="fas fa-paper-plane"></i> 发送请求
+                            </button>
+                            <button class="secondary" id="export-users">
+                                <i class="fas fa-download"></i> 导出用户
+                            </button>
+                            <button class="danger" id="clear-all">
+                                <i class="fas fa-trash"></i> 清空用户
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="response-area">
+                        <div class="response-title">
+                            <h3>响应结果</h3>
+                            <span class="status-indicator status-waiting" id="status-indicator">等待请求</span>
+                        </div>
+                        <div class="response-content" id="response-content">
+// 响应将显示在这里
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 收件源码下载页面 -->
+            <div id="download-page" class="page">
+                <div class="page-header">
+                    <h2 class="page-title">收件源码下载</h2>
+                    <p class="page-description">获取Cloudflare Worker部署代码，轻松实现邮件接收功能</p>
+                </div>
+                
+                <div class="page-content">
+                    <div class="card">
+                        <h3 class="card-title">Cloudflare Worker部署方法</h3>
+                        <p>请按照以下步骤部署Worker：</p>
+                        <ol>
+                            <li>登录<a href="https://dash.cloudflare.com" target="_blank">Cloudflare仪表板</a></li>
+                            <li>在左侧导航栏选择「Workers & Pages」</li>
+                            <li>点击「创建应用」→「Worker」→ 输入服务名称（如cloudmail-api）→ 选择区域 → 点击「创建」</li>
+                            <li>进入Worker编辑页面，删除默认代码</li>
+                            <li>复制下方提供的完整work.js代码，粘贴到编辑器中编辑代码中的await fetch('/api/public/emailList', 将/api/public/emailList补全换成你自己的</li>
+                            <li>点击「保存并部署」，等待部署完成</li>
+                            <li>部署成功后，在「路由」设置中添加你的域名规则（如：<code>example.com/*</code>）</li>
+                            <li>api收件访问地址为：<code>https://example.com/?token=你的获取的token（仅读取管理员的）</code></li>
+                        </ol>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">work.js源码下载</h3>
+                        <a href="https://gh.xmly.dev/https://github.com/banfeng-git/cloudmail-api/releases/download/tab/worker.js" 
+                           class="download-btn" 
+                           download="work.js">
+                            <i class="fas fa-download"></i> 点击下载work.js
+                        </a>
+                        <p style="margin-top: 15px; color: #7f8c8d;">（注：下载链接为第三方镜像，若无法访问可尝试原GitHub地址）</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 页脚 -->
+    <footer>
+        <p>© 2023 CloudmailAPI工具箱 | 一站式API工具集合</p>
+    </footer>
+
+    <script>
+        // 页面切换逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const pages = document.querySelectorAll('.page');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const targetPage = this.getAttribute('data-page');
+                    
+                    // 更新导航状态
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 更新页面显示
+                    pages.forEach(page => page.classList.remove('active'));
+                    document.getElementById(targetPage).classList.add('active');
+                });
+            });
+            
+            // 批量用户注册页面的JavaScript代码
+            const usersList = document.getElementById('users-list');
+            const generateUsersBtn = document.getElementById('generate-users');
+            const addSingleUserBtn = document.getElementById('add-single-user');
+            const sendRequestBtn = document.getElementById('send-request');
+            const clearAllBtn = document.getElementById('clear-all');
+            const exportUsersBtn = document.getElementById('export-users');
+            const responseContent = document.getElementById('response-content');
+            const statusIndicator = document.getElementById('status-indicator');
+            const usersCount = document.getElementById('users-count');
+            const passwordType = document.getElementById('password-type');
+            const useCustomPrefix = document.getElementById('use-custom-prefix');
+            const customPrefixContainer = document.getElementById('custom-prefix-container');
+            
+            let generatedUsers = [];
+            
+            // 显示/隐藏固定密码输入框
+            passwordType.addEventListener('change', function() {
+                const fixedPasswordContainer = document.getElementById('fixed-password-container');
+                fixedPasswordContainer.style.display = this.value === 'fixed' ? 'block' : 'none';
+            });
+            
+            // 显示/隐藏自定义前缀输入框
+            useCustomPrefix.addEventListener('change', function() {
+                customPrefixContainer.style.display = this.checked ? 'block' : 'none';
+            });
+            
+            // 生成随机字符串（字母和数字）
+            function generateRandomString(length = 8, numbersOnly = false) {
+                const letters = 'abcdefghijklmnopqrstuvwxyz';
+                const numbers = '0123456789';
+                const chars = numbersOnly ? numbers : letters + numbers;
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+            
+            // 生成随机密码
+            function generateRandomPassword() {
+                return generateRandomString(12);
+            }
+            
+            // 生成用户
+            generateUsersBtn.addEventListener('click', function() {
+                const count = parseInt(document.getElementById('user-count').value) || 5;
+                const usePrefix = document.getElementById('use-custom-prefix').checked;
+                const emailPrefix = document.getElementById('email-prefix').value;
+                const randomLength = parseInt(document.getElementById('random-length').value) || 4;
+                const domain = document.getElementById('email-domain').value;
+                const passwordTypeValue = document.getElementById('password-type').value;
+                const fixedPassword = document.getElementById('fixed-password').value;
+                
+                // 确定域名
+                let emailDomain = domain;
+                if (!emailDomain.startsWith('@')) {
+                    emailDomain = '@' + emailDomain;
+                }
+                
+                // 清空之前的用户
+                generatedUsers = [];
+                
+                // 生成用户列表
+                for (let i = 1; i <= count; i++) {
+                    // 生成邮箱
+                    let email;
+                    if (usePrefix && emailPrefix) {
+                        // 使用自定义前缀 + 随机部分
+                        const randomPart = generateRandomString(randomLength);
+                        email = `${emailPrefix}${randomPart}${emailDomain}`;
+                    } else {
+                        // 完全随机生成账号（字母+数字，最大8位）
+                        const randomLength = Math.floor(Math.random() * 8) + 1; // 1-8位随机长度
+                        email = `${generateRandomString(randomLength)}${emailDomain}`;
+                    }
+                    
+                    // 生成密码
+                    let password;
+                    if (passwordTypeValue === 'fixed' && fixedPassword) {
+                        password = fixedPassword;
+                    } else {
+                        password = generateRandomPassword();
+                    }
+                    
+                    generatedUsers.push({
+                        email: email,
+                        password: password,
+                        // 不发送roleName字段，使用默认权限
+                    });
+                }
+                
+                // 更新用户列表显示
+                updateUsersList();
+            });
+            
+            // 添加单个用户
+            addSingleUserBtn.addEventListener('click', function() {
+                const email = document.getElementById('single-email').value;
+                let password = document.getElementById('single-password').value;
+                
+                if (!email) {
+                    alert('请输入邮箱地址！');
+                    return;
+                }
+                
+                // 如果密码为空，则自动生成
+                if (!password) {
+                    password = generateRandomPassword();
+                }
+                
+                generatedUsers.push({
+                    email: email,
+                    password: password,
+                    // 不发送roleName字段，使用默认权限
+                });
+                
+                // 清空单个用户表单
+                document.getElementById('single-email').value = '';
+                document.getElementById('single-password').value = '';
+                
+                // 更新用户列表显示
+                updateUsersList();
+            });
+            
+            // 更新用户列表显示
+            function updateUsersList() {
+                usersList.innerHTML = '';
+                
+                if (generatedUsers.length === 0) {
+                    usersList.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #6c757d;">
+                                尚未生成用户，请添加用户
+                            </td>
+                        </tr>
+                    `;
+                    usersCount.textContent = '(0 个用户)';
+                    return;
+                }
+                
+                generatedUsers.forEach((user, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${user.email}</td>
+                        <td>${user.password}</td>
+                        <td>默认</td>
+                        <td>
+                            <button class="btn-danger delete-user" data-index="${index}" style="padding: 5px 10px; font-size: 12px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    usersList.appendChild(row);
+                });
+                
+                // 添加删除单个用户的功能
+                document.querySelectorAll('.delete-user').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        generatedUsers.splice(index, 1);
+                        updateUsersList();
+                    });
+                });
+                
+                usersCount.textContent = `(${generatedUsers.length} 个用户)`;
+            }
+            
+            // 清空用户
+            clearAllBtn.addEventListener('click', function() {
+                if (confirm('确定要清空所有用户数据吗？')) {
+                    generatedUsers = [];
+                    updateUsersList();
+                }
+            });
+            
+            // 发送请求
+            sendRequestBtn.addEventListener('click', function() {
+                const apiUrl = document.getElementById('api-url').value;
+                const authToken = document.getElementById('auth-token').value;
+                
+                // 验证必填字段
+                if (!apiUrl) {
+                    alert('请输入接口地址！');
+                    return;
+                }
+                
+                if (!authToken) {
+                    alert('请输入Authorization令牌！');
+                    return;
+                }
+                
+                if (generatedUsers.length === 0) {
+                    alert('请先生成用户！');
+                    return;
+                }
+                
+                // 构建请求数据
+                const requestData = {
+                    list: generatedUsers
+                };
+                
+                // 更新UI为正在加载状态
+                sendRequestBtn.disabled = true;
+                sendRequestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 发送中...';
+                statusIndicator.textContent = '请求中';
+                statusIndicator.className = 'status-indicator status-waiting';
+                responseContent.textContent = '正在发送请求...';
+                
+                // 使用fetch发送真实请求
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authToken
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('网络响应不正常');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    statusIndicator.textContent = '成功';
+                    statusIndicator.className = 'status-indicator status-success';
+                    responseContent.textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    statusIndicator.textContent = '错误';
+                    statusIndicator.className = 'status-indicator status-error';
+                    responseContent.textContent = JSON.stringify({
+                        status: 'error',
+                        message: '请求失败: ' + error.message,
+                        errorCode: 'REQUEST_FAILED'
+                    }, null, 2);
+                })
+                .finally(() => {
+                    // 恢复按钮状态
+                    sendRequestBtn.disabled = false;
+                    sendRequestBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 发送请求';
+                });
+            });
+            
+            // 导出用户为TXT格式
+            exportUsersBtn.addEventListener('click', function() {
+                if (generatedUsers.length === 0) {
+                    alert('没有用户数据可导出！');
+                    return;
+                }
+                
+                // 生成TXT内容，格式为：邮箱----密码
+                let txtContent = '';
+                generatedUsers.forEach(user => {
+                    txtContent += `${user.email}----${user.password}\n`;
+                });
+                
+                const blob = new Blob([txtContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'users.txt';
+                a.click();
+                
+                URL.revokeObjectURL(url);
+            });
+            
+            // Token生成页面的JavaScript代码
+            document.getElementById('tokenForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const apiEndpoint = document.getElementById('apiEndpoint').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const resultDiv = document.getElementById('result');
+                const resultContent = document.getElementById('resultContent');
+                const loader = document.getElementById('loader');
+                
+                // 验证URL格式
+                if (!isValidUrl(apiEndpoint)) {
+                    resultDiv.className = 'result error';
+                    resultContent.textContent = '错误：请输入有效的API接口地址，例如 https://api.example.com/api/public/genToken';
+                    resultDiv.style.display = 'block';
+                    return;
+                }
+                
+                // 显示加载动画
+                loader.style.display = 'block';
+                resultDiv.style.display = 'none';
+                
+                try {
+                    // 发送POST请求
+                    const response = await fetch(apiEndpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // 隐藏加载动画
+                    loader.style.display = 'none';
+                    
+                    // 显示结果
+                    resultDiv.className = response.ok ? 'result success' : 'result error';
+                    resultContent.textContent = JSON.stringify(data, null, 2);
+                    resultDiv.style.display = 'block';
+                    
+                } catch (error) {
+                    // 隐藏加载动画
+                    loader.style.display = 'none';
+                    
+                    // 显示错误
+                    resultDiv.className = 'result error';
+                    resultContent.textContent = '请求失败: ' + error.message;
+                    resultDiv.style.display = 'block';
+                }
+            });
+            
+            // 简单的URL验证函数
+            function isValidUrl(string) {
+                try {
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
