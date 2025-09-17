@@ -19,3 +19,6 @@
                 const response = await fetch('/api/public/emailList', 
                 
 将/api/public/emailList连接补充完整 让后部署绑定自定义域然后访问你的域名?token=你获取的token 
+
+# 工具箱cf部署方法
+新建work名称随意编辑work把work-工具箱的代码替换到编辑的work里面直接提交即可
