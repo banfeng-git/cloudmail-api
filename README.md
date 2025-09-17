@@ -1,3 +1,5 @@
+![image](https://github.com/banfeng-git/cloudmail-api/blob/main/%E6%89%B9%E6%B3%A8%202025-09-17%20105648.png)
+ 
  1.直接本地运行token.html根据提示获取即可
  
 然后访问页面根据提示获取token
