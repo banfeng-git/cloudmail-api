@@ -1,6 +1,7 @@
 ![image](https://github.com/banfeng-git/cloudmail-api/blob/main/%E6%89%B9%E6%B3%A8%202025-09-17%20105648.png)
- 
- 1.直接本地运行token.html根据提示获取即可
+
+ # 本地部署
+ 1.直接本地运行工具箱.html根据提示获取即可
  
 然后访问页面根据提示获取token
 
@@ -13,6 +14,12 @@
  3.api收件使用访问你的域名/sjapi.html?token=你获取的token  注意:需要网页的需要吧token.html改为index.php上传到服务器或者虚拟主机即可访问你的域名?token=你获取的token 
  
  4.批量生成同1的方式 
+
+
+ # 服务器部署或虚拟主机
+ 上传工具箱把工具箱.html改为index.php
+ 新建一个目录为api在新建的目录内上传sjpi.html并改名为index.php 支持7.4
+ 访问你的域名?token=你获取的token 
  
 # cloudflare  work的方式（worker-2025-09-15.js为api收件）
 
